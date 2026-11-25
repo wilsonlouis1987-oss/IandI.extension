@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: iandi-bim-license-api
+    runtime: docker
+    dockerfilePath: ./license_server/Dockerfile
+    dockerContext: ./license_server
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: IANDI_ADMIN_TOKEN
+        sync: false
+      - key: LICENSE_DB
+        value: /data/licenses.db
+    disk:
+      name: iandi-license-data
+      mountPath: /data
+      sizeGB: 1
