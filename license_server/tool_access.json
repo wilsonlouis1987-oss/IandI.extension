@@ -1,0 +1,30 @@
+{
+  "product": "I&I BIM Tools",
+  "policy": "all_tools_pro_by_default",
+  "free_tool_ids": [
+    "A02",
+    "A07",
+    "B01",
+    "B12",
+    "B15",
+    "B16",
+    "B22",
+    "C03",
+    "D09"
+  ],
+  "free_tool_titles": {
+    "A02": "Levels from Excel",
+    "A07": "Project Units",
+    "B01": "Grids from CAD",
+    "B12": "Line or CAD to Wall",
+    "B15": "Shaft Openings",
+    "B16": "Slab on Outer Wall",
+    "B22": "Grids from Image or CAD",
+    "C03": "Wall Skirting",
+    "D09": "Sheets from View List"
+  },
+  "selected_count": 9,
+  "target_free_count": 10,
+  "pending_free_tool_selection": 1,
+  "note": "User selected these tool numbers from the numbered inventory. Duplicate selection 23 counted once. All other tools are Pro by default."
+}
