@@ -10,7 +10,8 @@
     "B16",
     "B22",
     "C03",
-    "D09"
+    "D09",
+    "D13"
   ],
   "free_tool_titles": {
     "A02": "Levels from Excel",
@@ -21,10 +22,11 @@
     "B16": "Slab on Outer Wall",
     "B22": "Grids from Image or CAD",
     "C03": "Wall Skirting",
-    "D09": "Sheets from View List"
+    "D09": "Sheets from View List",
+    "D13": "Area Statement FAR"
   },
-  "selected_count": 9,
+  "selected_count": 10,
   "target_free_count": 10,
-  "pending_free_tool_selection": 1,
-  "note": "User selected these tool numbers from the numbered inventory. Duplicate selection 23 counted once. All other tools are Pro by default."
+  "pending_free_tool_selection": 0,
+  "note": "User selected these 10 tools. Duplicate selection 23 counted once. All other tools are Pro by default."
 }
