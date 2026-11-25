@@ -1,9 +1,13 @@
-name: Build BIM Installer
+name: Build and Publish I&I BIM Tools Installer
 
 on:
   push:
     branches: [ main ]
+    tags: [ "v*" ]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -12,14 +16,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Verify extension payload exists
+        shell: pwsh
+        run: |
+          $dyn = Get-ChildItem -Path . -Recurse -Filter *.dyn -File |
+            Where-Object { $_.FullName -notmatch '\\.git\\|\\Output\\' }
+          if (-not $dyn) {
+            throw "No Dynamo .dyn tool files found in repository. Add the actual IandI.extension payload before publishing an installer."
+          }
+
       - name: Install Inno Setup
         run: choco install innosetup -y
 
       - name: Compile Installer
         run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss'
 
-      - name: Upload Installer
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: I_and_I_BIM_Tools_Installer
           path: Output\I_and_I_BIM_Tools_Installer.exe
+          if-no-files-found: error
+
+      - name: Publish installer to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Output/I_and_I_BIM_Tools_Installer.exe
+          generate_release_notes: true
