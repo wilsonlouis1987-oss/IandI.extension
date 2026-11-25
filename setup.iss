@@ -8,4 +8,4 @@ Compression=lzma
 SolidCompression=yes
 
 [Files]
-Source: "IandI.extension\\*"; DestDir: "{app}\\I_and_I_BIM_Tools.extension"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "Output*,*.zip"
+Source: "IandI.extension\*"; DestDir: "{app}\I_and_I_BIM_Tools.extension"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "Output*,*.zip"
