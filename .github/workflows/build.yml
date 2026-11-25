@@ -2,27 +2,61 @@ name: Build and Publish I&I BIM Tools Installer
 
 on:
   push:
-    branches: [ main ]
-    tags: [ "v*" ]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
+  payload-check:
+    runs-on: windows-latest
+    outputs:
+      has_payload: ${{ steps.check.outputs.has_payload }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Check for extension payload
+        id: check
+        shell: pwsh
+        run: |
+          if (Test-Path "IandI.extension.zip") {
+            "has_payload=true" >> $env:GITHUB_OUTPUT
+            Write-Host "Extension archive found."
+          } elseif (Test-Path "IandI.extension") {
+            $dyn = Get-ChildItem -Path "IandI.extension" -Recurse -Filter *.dyn -File
+            if ($dyn) {
+              "has_payload=true" >> $env:GITHUB_OUTPUT
+              Write-Host "Extension folder found."
+            } else {
+              "has_payload=false" >> $env:GITHUB_OUTPUT
+              Write-Warning "IandI.extension folder has no .dyn tools."
+            }
+          } else {
+            "has_payload=false" >> $env:GITHUB_OUTPUT
+            Write-Warning "Installer build skipped: add the actual IandI.extension.zip payload to the repository root."
+          }
+
   build:
+    needs: payload-check
+    if: needs.payload-check.outputs.has_payload == 'true'
     runs-on: windows-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Verify extension payload exists
+      - name: Extract extension payload
         shell: pwsh
         run: |
-          $dyn = Get-ChildItem -Path . -Recurse -Filter *.dyn -File |
-            Where-Object { $_.FullName -notmatch '\\.git\\|\\Output\\' }
+          if (Test-Path "IandI.extension.zip") {
+            Expand-Archive -Path "IandI.extension.zip" -DestinationPath "." -Force
+          }
+
+      - name: Verify extension payload
+        shell: pwsh
+        run: |
+          $dyn = Get-ChildItem -Path "IandI.extension" -Recurse -Filter *.dyn -File
           if (-not $dyn) {
-            throw "No Dynamo .dyn tool files found in repository. Add the actual IandI.extension payload before publishing an installer."
+            throw "IandI.extension payload is missing Dynamo .dyn files."
           }
 
       - name: Install Inno Setup
