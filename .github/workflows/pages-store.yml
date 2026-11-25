@@ -1,10 +1,12 @@
-name: Publish I&I Store page to GitHub Pages
+name: Publish I&I website to GitHub Pages
 
 on:
   push:
     branches: [ main ]
     paths:
+      - index.html
       - store.html
+      - assets/**
       - .github/workflows/pages-store.yml
   workflow_dispatch:
 
@@ -28,10 +30,19 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - name: Prepare Store page
-        run: mkdir -p public && cp store.html public/index.html
+      - name: Prepare website
+        run: |
+          mkdir -p public
+          if [ -f index.html ]; then
+            cp index.html public/index.html
+          elif [ -f store.html ]; then
+            cp store.html public/index.html
+          else
+            echo "No index.html or store.html found." >&2
+            exit 1
+          fi
+          if [ -d assets ]; then cp -r assets public/assets; fi
+          if [ -f store.html ]; then cp store.html public/store.html; fi
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
