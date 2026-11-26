@@ -14,7 +14,7 @@ def db():
     c=sqlite3.connect(DB,timeout=15); c.row_factory=sqlite3.Row
     c.execute('PRAGMA busy_timeout=15000'); c.execute('PRAGMA journal_mode=WAL')
     c.execute('CREATE TABLE IF NOT EXISTS licenses(key_hash TEXT PRIMARY KEY,plan TEXT NOT NULL,expires_at TEXT,max_devices INTEGER NOT NULL DEFAULT 1,revoked INTEGER NOT NULL DEFAULT 0,created_at TEXT NOT NULL)')
-    c.execute('CREATE TABLE IF NOT EXISTS activations(key_hash TEXT NOT NULL,device_id TEXT NOT NULL,activated_at TEXT NOT NULL,PRIMARY KEY(key_hash,device_id))')
+    # Migrate the original prototype schema, which did not include created_at.\n    cols=[row[1] for row in c.execute('PRAGMA table_info(licenses)').fetchall()]\n    if 'created_at' not in cols: c.execute('ALTER TABLE licenses ADD COLUMN created_at TEXT')\n    c.execute('CREATE TABLE IF NOT EXISTS activations(key_hash TEXT NOT NULL,device_id TEXT NOT NULL,activated_at TEXT NOT NULL,PRIMARY KEY(key_hash,device_id))')
     return c
 
 def digest(k): return hashlib.sha256(k.strip().encode('utf-8')).hexdigest()
