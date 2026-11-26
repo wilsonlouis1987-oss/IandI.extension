@@ -1,0 +1,48 @@
+ if(!/^(Enquire about|Discuss your interior|Start a project|Send an enquiry)/.test(t))return;
+ a.addEventListener("click",function(e){var m=t.match(/^Enquire about (.+)$/);if(m&&!/this project/i.test(m[1]))pick(m[1]);if(/^Discuss your interior/.test(t))pick("interior design");
+  if(mq.matches){e.preventDefault();open()}})});
+})();</script>
+<script id="pp-js">(function(){
+var people=[].slice.call(document.querySelectorAll(".team .person"));if(!people.length)return;
+var rm=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var back=document.createElement("div");back.className="wy-back";back.hidden=true;
+var card=document.createElement("div");card.className="wy-card pp-card";card.hidden=true;card.setAttribute("role","dialog");card.setAttribute("aria-modal","true");card.setAttribute("aria-labelledby","pp-t");
+card.innerHTML='<button type="button" class="wy-x" aria-label="Close">&times;</button><img class="pp-img" alt="" width="220" height="220"><div><h4 id="pp-t"></h4><p class="pp-role"></p><p class="wy-p"></p></div>';
+document.body.appendChild(back);document.body.appendChild(card);
+var cur=null,timer=0,token=0;
+function stopAnims(){try{card.getAnimations().forEach(function(a){a.cancel()})}catch(e){}}
+function hold(on){window.__rgHold=!!on}
+function from(b){var r=b.getBoundingClientRect(),c=card.getBoundingClientRect();return{dx:r.left+r.width/2-(c.left+c.width/2),dy:r.top+r.height/2-(c.top+c.height/2),s:Math.max(.12,Math.min(1,r.width/c.width))}}
+function hardReset(){token++;clearTimeout(timer);stopAnims();card.hidden=true;back.hidden=true;back.classList.remove("show");card.classList.remove("show");cur=null;hold(false)}
+function open(p){
+  hardReset();var my=++token;cur=p;hold(true);
+  var im=p.querySelector("img");
+  var img=card.querySelector(".pp-img");img.src=im.currentSrc||im.src;img.alt=im.alt;
+  card.querySelector("#pp-t").textContent=p.querySelector("h3").textContent;
+  card.querySelector(".pp-role").textContent=p.querySelector(".role").textContent;
+  card.querySelector(".wy-p").textContent=p.querySelector("div > p:not(.role)").textContent;
+  [".pp-img","h4",".pp-role",".wy-p"].forEach(function(s,k){card.querySelector(s).style.animationDelay=(.16+k*.07)+"s"});
+  back.hidden=false;card.hidden=false;card.scrollTop=0;
+  requestAnimationFrame(function(){if(my!==token)return;back.classList.add("show");card.classList.add("show");
+    if(!rm){var f=from(p);card.animate([{transform:"translate("+f.dx+"px,"+f.dy+"px) scale("+f.s+")",opacity:0},{transform:"translate(0,0) scale(1.02)",opacity:1,offset:.8},{transform:"none",opacity:1}],{duration:560,easing:"cubic-bezier(.2,.85,.25,1)"})}
+    try{card.querySelector(".wy-x").focus({preventScroll:true})}catch(e){}});
+}
+function close(){
+  if(!cur)return;var p=cur,my=++token;stopAnims();back.classList.remove("show");
+  var fin=function(){if(my!==token)return;clearTimeout(timer);stopAnims();card.hidden=true;back.hidden=true;card.classList.remove("show");cur=null;hold(false);try{p.focus({preventScroll:true})}catch(e){}};
+  if(rm){fin();return}
+  var f=from(p);card.animate([{transform:"none",opacity:1},{transform:"translate("+f.dx+"px,"+f.dy+"px) scale("+f.s+")",opacity:0}],{duration:400,easing:"cubic-bezier(.6,0,.8,.4)",fill:"forwards"});
+  timer=setTimeout(fin,440);
+}
+people.forEach(function(p){
+  p.classList.add("pp");p.tabIndex=0;p.setAttribute("role","button");p.setAttribute("aria-haspopup","dialog");
+  var d=p.querySelector("div > p.role");
+  var m=document.createElement("span");m.className="pp-more";m.innerHTML='<span class="pp-pl" aria-hidden="true"></span>View profile';
+  d.parentNode.insertBefore(m,d.nextSibling);
+  p.addEventListener("click",function(){if(cur===p&&!card.hidden){close()}else{open(p)}});
+  p.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open(p)}});
+});
+back.addEventListener("click",close);card.querySelector(".wy-x").addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape")close()});
+})();</script></body>
+</html>

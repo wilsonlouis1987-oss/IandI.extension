@@ -1,0 +1,100 @@
+    { n:'400', t:'Fabrication & assembly', st:'Construction stage',
+      g:'Construction-ready model with complete detailing, assemblies, connections, joints, flashing, fasteners and installation clearances.',
+      i:'Manufacturer specifications, fabrication tolerances, assembly sequences and shop drawing data.',
+      u:['Off-site prefabrication','CNC manufacturing','Shop drawings','Installation sequencing'] },
+    { n:'500', t:'As-built & facility management', st:'Operations stage',
+      g:'Field-verified model that matches the finished building in size, shape, location and finishes.',
+      i:'Real asset data: serial numbers, warranties, O&M manuals, commissioning dates and MEP asset tags.',
+      u:['Facility management','Lifecycle maintenance','Renovations','Digital twin'] }
+  ];
+  const lxs = document.getElementById('lxs'), lxt = document.getElementById('lxt'), lxd = document.getElementById('lxd');
+  const lxi = [...lxs.querySelectorAll('.lxi')];
+  lxt.insertAdjacentHTML('beforeend', LX.map((l, k) => `<button type="button" role="tab" id="lxtab${k}" aria-controls="lxd" aria-selected="${k === 0}" tabindex="${k === 0 ? 0 : -1}"><b>${l.n}</b><small>${l.t}</small></button>`).join(''));
+  const lxb = [...lxt.querySelectorAll('button')];
+  let lxk = 0;
+  const lxShow = (k, focus) => {
+    lxk = Math.max(0, Math.min(LX.length - 1, k)); const l = LX[lxk];
+    lxi.forEach((im, j) => im.classList.toggle('on', j === lxk));
+    lxb.forEach((b, j) => { b.setAttribute('aria-selected', j === lxk); b.tabIndex = j === lxk ? 0 : -1; });
+    if (focus) lxb[lxk].focus();
+    document.getElementById('lxfill').style.width = ((lxk + 1) / LX.length * 100) + '%';
+    document.getElementById('lxchip').textContent = `LOD ${l.n} · ${l.t}`;
+    document.getElementById('lxn').textContent = `0${lxk + 1} / 0${LX.length}`;
+    document.getElementById('lxp').disabled = lxk === 0;
+    document.getElementById('lxnx').disabled = lxk === LX.length - 1;
+    lxd.setAttribute('aria-labelledby', 'lxtab' + lxk);
+    lxd.innerHTML = `<p class="lxk">${l.st}</p><h3>LOD <em>${l.n}</em></h3><p class="lxst">${esc(l.t)}</p><div class="lxr"><h4>Visual geometry</h4><p>${esc(l.g)}</p></div><div class="lxr"><h4>Information included</h4><p>${esc(l.i)}</p></div><div class="lxr"><h4>Primary uses</h4><ul class="lxu">${l.u.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>${l.x ? `<div class="lxr"><h4>LOD 350</h4><p>${esc(l.x)}</p></div>` : ''}`;
+  };
+  lxb.forEach((b, k) => b.addEventListener('click', () => lxShow(k)));
+  lxt.addEventListener('keydown', e => { if (e.key === 'ArrowRight') { e.preventDefault(); lxShow(lxk + 1, true); } if (e.key === 'ArrowLeft') { e.preventDefault(); lxShow(lxk - 1, true); } });
+  document.getElementById('lxp').addEventListener('click', () => lxShow(lxk - 1));
+  document.getElementById('lxnx').addEventListener('click', () => lxShow(lxk + 1));
+  let lx0 = null;
+  lxs.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; lx0 = e.clientX; });
+  lxs.addEventListener('pointerup', e => { if (lx0 === null) return; const dx = e.clientX - lx0; lx0 = null; if (Math.abs(dx) > 40) lxShow(lxk + (dx < 0 ? 1 : -1)); });
+  lxs.addEventListener('pointercancel', () => { lx0 = null; });
+  lxShow(0);
+  // ===== Script store =====
+  const SG = [
+    { k:'A', id:'setup', t:'Project setup & standards', n:[
+      ['A01','New project setup, ISO 19650','Sets up worksets, view templates, views and sheets for a new project to ISO 19650 in one run.','A01_SETUP_New_Project_ISO19650_Worksets_Templates_Views_Sheets.dyn',['ISO 19650']],
+      ['A02','Project info, units & shared parameters','Fills project information, units and shared parameters straight from Excel.','A02_SETUP_Project_Info_Units_Shared_Parameters_From_Excel.dyn',['Excel']],
+      ['A03','Levels from Excel','Creates and renames levels and sets their elevations from an Excel list.','A03_SETUP_Levels_Create_Rename_Elevations_From_Excel.dyn',['Excel']],
+      ['A04','Plans for every level','Creates floor, ceiling and area plans for each level from Excel.','A04_SETUP_Floor_Ceiling_Area_Plans_Per_Level_From_Excel.dyn',['Excel']],
+      ['A05','Schedules from Excel','Builds door, window, room finish and sheet schedules from Excel.','A05_SETUP_Door_Window_Room_Finish_Sheet_Schedules_From_Excel.dyn',['Excel']],
+      ['A06','Project & dimension units','Switches project and dimension units between mm, cm, m and feet-inches.','A06_SETUP_Project_And_Dimension_Units_MM_CM_M_Feet_Inches.dyn',[]],
+      ['A07','Revit colours & workspace','Sets Revit colours, ribbon, properties, project browser and background.','A07_SETUP_Revit_Colours_Ribbon_Properties_Project_Browser_Background.dyn',[]],
+      ['A08','Client BIM requirements check','Imports and checks client requirements: BEP, AIR, COBie, FM, MIDP and materials.','A08_SETUP_Client_BIM_Requirements_BEP_AIR_COBie_FM_MIDP_Materials_Import_Setup_Check.dyn',['ISO 19650','COBie']]
+    ]},
+    { k:'B', id:'model', t:'Modeling & CAD to BIM', n:[
+      ['B01','Grids on wall centrelines','Places grids along wall centrelines automatically.','B01_MODEL_Grids_On_Wall_Centrelines.dyn',[]],
+      ['B02','Walls from CAD double lines','Turns CAD double lines into Revit walls.','B02_MODEL_Walls_From_CAD_Double_Lines.dyn',['CAD']],
+      ['B03','Doors from CAD swing arcs','Reads door swing arcs in CAD and places Revit doors.','B03_MODEL_Doors_From_CAD_Swing_Arcs.dyn',['CAD']],
+      ['B04','Roof from lines or CAD','Builds the roof from Revit lines or a CAD roof plan.','B04_MODEL_Roof_From_Revit_Lines_Or_CAD_Roof_Plan.dyn',['CAD']],
+      ['B05','CAD lines to walls with doors','Converts CAD lines into walls and places the doors in one step.','B05_MODEL_Line_To_Wall_CAD_To_Wall_With_Doors.dyn',['CAD']],
+      ['B06','Wall layers from a section image','Reads a wall section detail image and builds the wall type layers.','B06_MODEL_Wall_Type_Layers_From_Section_Detail_Image.dyn',['Image']],
+      ['B07','3D model from a plan image or PDF','Builds walls, doors and windows from a plan image or PDF.','B07_MODEL_3D_Walls_Doors_Windows_From_Plan_Image_Or_PDF.dyn',['Image','PDF']],
+      ['B08','Shaft openings from X lines','Cuts shaft openings wherever X lines are drawn, in Revit or CAD.','B08_MODEL_Shaft_Openings_From_X_Lines_Revit_Or_CAD.dyn',['CAD']],
+      ['B09','Slabs on the outer walls','Creates slabs on the outer wall perimeter or from CAD, and copies them to levels.','B09_MODEL_Slab_On_Outer_Wall_Perimeter_Or_CAD_Copy_To_Levels.dyn',['CAD']],
+      ['B10','Floor tile pattern from an image','Recreates a floor tile pattern from a reference image.','B10_MODEL_Floor_Tile_Pattern_From_Image.dyn',['Image']],
+      ['B11','Stairs from lines or CAD treads','Builds stairs from Revit lines or CAD tread lines.','B11_MODEL_Stairs_From_Revit_Lines_Or_CAD_Tread_Lines.dyn',['CAD']],
+      ['B12','Columns & beams from grids','Places structural columns and beams from plan grids or walls.','B12_MODEL_Structural_Columns_Beams_From_Plan_Grids_Or_Walls.dyn',['Structural']],
+      ['B13','Doors & windows clear of columns','Moves doors and windows along the wall so they clear the columns.','B13_MODEL_Doors_Windows_Clear_Of_Columns_Shift_Along_Wall.dyn',[]]
+    ]},
+    { k:'C', id:'int', t:'Interiors', n:[
+      ['C01','Room names, finishes & areas','Sets room names, finishes and target areas from Excel.','C01_INTERIOR_Room_Names_Finishes_Target_Area_From_Excel.dyn',['Excel']],
+      ['C02','False ceilings & bulkheads','Creates false ceilings and bulkheads room by room from CAD.','C02_INTERIOR_False_Ceilings_Bulkheads_Per_Room_From_CAD.dyn',['CAD']],
+      ['C03','Wall skirting','Adds skirting to the inside and outside faces of walls.','C03_INTERIOR_Wall_Skirting_Inside_Outside_Faces.dyn',[]],
+      ['C04','Door & window marks by room','Numbers doors and windows by room and tags them from Excel.','C04_INTERIOR_Door_Window_Marks_By_Room_And_Tags_From_Excel.dyn',['Excel']]
+    ]},
+    { k:'D', id:'dwg', t:'Drawings, annotation & sheets', n:[
+      ['D01','Sheets & views from a drawing list','Creates ISO 19650 sheets and views from an Excel drawing list.','D01_DRAWINGS_ISO19650_Sheets_And_Views_From_Excel_Drawing_List.dyn',['ISO 19650','Excel']],
+      ['D02','Each view on its own sheet','Places every selected view on its own sheet.','D02_DRAWINGS_Place_Each_View_On_Own_Sheet.dyn',[]],
+      ['D03','RCP sheet with colour plan','Builds the RCP sheet with a ceiling colour plan, legend and schedule.','D03_DRAWINGS_RCP_Sheet_Ceiling_Colour_Plan_Legend_Schedule.dyn',[]]
+    ]}
+  ];
+  const ALL = SG.flatMap(g => g.n.map(x => ({ c:x[0], t:x[1], d:x[2], f:x[3], tg:x[4], g })));
+  const stg = document.getElementById('stg');
+  const cardH = x => `<article class="sc" data-g="${x.g.id}" data-q="${esc((x.c+' '+x.t+' '+x.d+' '+x.tg.join(' ')).toLowerCase())}"><div class="scb"><div class="sct"><span class="scc">${x.c}</span><h3>${esc(x.t)}</h3></div><p>${esc(x.d)}</p><code class="scf">${esc(x.f)}</code><div class="scr"><span class="sctg">Dynamo${x.tg.map(t => ' · ' + esc(t)).join('')}</span><button type="button" data-buy="${x.c}"><svg aria-hidden="true"><use href="#ic-bag"/></svg>Buy</button></div></div></article>`;
+  stg.innerHTML = SG.map(g => `<section class="sgp" data-g="${g.id}"><div class="sgh"><div><span class="sgk">${g.k}</span><h3>${esc(g.t)}</h3><small>${g.n.length} scripts · Price on request</small></div><button type="button" class="sgb" data-pack="${g.id}"><svg aria-hidden="true"><use href="#ic-bag"/></svg>Buy the ${g.k} pack</button></div><div class="sgl">${g.n.map(x => cardH(ALL.find(y => y.c === x[0]))).join('')}</div></section>`).join('') + '<p class="sempty" id="sempty" hidden>No scripts match your search.</p>';
+  document.getElementById('stcount').textContent = ALL.length;
+  const store = document.getElementById('store');
+  let stFocus = null;
+  const openStore = e => { stFocus = e?.currentTarget || null; store.hidden = false; document.body.classList.add('stopen'); store.querySelector('.pmx').focus({ preventScroll: true }); };
+  const closeStore = () => { store.hidden = true; document.body.classList.remove('stopen'); stFocus?.focus({ preventScroll: true }); };
+  document.querySelectorAll('[data-store]').forEach(b => b.addEventListener('click', openStore));
+  store.querySelectorAll('[data-stclose]').forEach(b => b.addEventListener('click', closeStore));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !store.hidden) closeStore(); });
+  let sfv = 'all';
+  const sq = document.getElementById('sq');
+  const applyS = () => {
+    const q = sq.value.trim().toLowerCase(); let any = 0;
+    stg.querySelectorAll('.sgp').forEach(sec => {
+      let n = 0;
+      sec.querySelectorAll('.sc').forEach(c => { const ok = (sfv === 'all' || c.dataset.g === sfv) && (!q || c.dataset.q.includes(q)); c.hidden = !ok; n += ok; });
+      sec.hidden = !n; any += n;
+    });
+    document.getElementById('sempty').hidden = !!any;
+  };
+  const sfb = [...store.querySelectorAll('.stf button')];
+  sfb.forEach(b => b.addEventListener('click', () => { sfv = b.dataset.sf; sfb.forEach(x => x.setAttribute('aria-pressed', x === b)); applyS(); store.querySelector('.stp').scrollTo({ top: 0 }); }));

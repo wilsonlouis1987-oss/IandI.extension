@@ -1,0 +1,100 @@
+  sq.addEventListener('input', applyS);
+  const toForm = (where, msg) => {
+    closeStore();
+    const ty = document.getElementById('ty'); [...ty.options].forEach(o => { if (o.text.startsWith('BIM automation')) ty.value = o.value; });
+    document.getElementById('st').value = where;
+    document.getElementById('ms').value = msg;
+    if (window.matchMedia('(max-width:640px)').matches && window.__openEnquiry) { window.__openEnquiry(); return; }
+    document.getElementById('contact').scrollIntoView({ behavior: calm3 ? 'auto' : 'smooth' });
+    setTimeout(() => document.getElementById('nm').focus({ preventScroll: true }), 600);
+  };
+  document.getElementById('iandi-pro-enquire')?.addEventListener('click', () => {
+    toForm('I&I BIM Tools Pro licence', 'I would like information about the I&I BIM Tools Pro licence, supported Revit versions, price, activation and installation. Please contact me with the official purchase process.');
+  });
+  stg.querySelectorAll('[data-buy]').forEach(b => b.addEventListener('click', () => {
+    const x = ALL.find(y => y.c === b.dataset.buy);
+    toForm('Script store', `I would like to buy script ${x.c}: ${x.t} (${x.f}). Please send the price, licence details and setup steps. We use Revit ____.`);
+  }));
+  stg.querySelectorAll('[data-pack]').forEach(b => b.addEventListener('click', () => {
+    const g = SG.find(y => y.id === b.dataset.pack);
+    toForm('Script store', `I would like to buy the ${g.k} pack: ${g.t} (${g.n.length} scripts: ${g.n.map(x => x[0]).join(', ')}). Please send the price, licence details and setup steps. We use Revit ____.`);
+  }));
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if ('IntersectionObserver' in window && !reduce) {
+    const els = document.querySelectorAll('.head, .art, .wt, .disc, .auto, .code, .step, .qa, .person, .lv, .pgal figure, .alsog div, .why, .intro > *');
+    els.forEach(e => e.classList.add('rv'));
+    const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -8% 0px' });
+    els.forEach(e => io.observe(e));
+    const nums = document.querySelectorAll('[data-n]');
+    const co = new IntersectionObserver(es => es.forEach(en => {
+      if (!en.isIntersecting) return;
+      const el = en.target, n = +el.dataset.n, suf = el.dataset.s || '', t0 = performance.now();
+      const step = t => { const k = Math.min(1, (t - t0) / 1400), v = Math.round(n * (1 - (1 - k) ** 3)); el.textContent = v + suf; if (k < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step); co.unobserve(el);
+    }), { threshold: .6 });
+    nums.forEach(e => co.observe(e));
+  }
+
+  const discs = [...document.querySelectorAll('.disc')];
+  discs.forEach(d => d.addEventListener('toggle', () => { if (d.open) discs.forEach(o => { if (o !== d && o.parentElement === d.parentElement) o.open = false; }); }));
+
+  const levels = [
+    ['100', 'Concept', 'A placeholder mass for approximate size and position.', 'Early visualization and massing'],
+    ['200', 'Approximate', 'Generic elements with approximate size and location.', 'Design development support'],
+    ['300', 'Precise', 'Exact member sizes, positions and quantities.', 'GA drawings, sections, take-offs'],
+    ['350', 'Interfaces', 'Connections to other systems, such as MEP services.', 'Clash review and coordination'],
+    ['400', 'Fabrication', 'Plates, bolts and details ready for the shop.', 'Steel, precast, facade and MEP shop drawings'],
+    ['500', 'As-built', 'Verified against what was built on site.', 'As-built documentation']
+  ];
+  const node = L => {
+    let s = '<svg viewBox="0 0 160 120" aria-hidden="true">';
+    if (L === 100) s += '<rect class="lm" x="40" y="22" width="80" height="80"/>';
+    if (L === 200) s += '<rect class="lg" x="54" y="14" width="18" height="96"/><rect class="lg" x="72" y="44" width="76" height="14"/>';
+    if (L >= 300) s += '<path class="lg" d="M48 14h30v6h-11v84h11v6H48v-6h11V20H48z"/><path class="lg" d="M78 40h70v5H78zM78 59h70v5H78zM84 45v14"/><path class="lt" d="M78 30h70M78 26v8M148 26v8"/>';
+    if (L >= 350) s += '<rect class="ld" x="96" y="78" width="44" height="22" rx="3"/>';
+    if (L >= 400) s += '<rect class="lf" x="78" y="36" width="7" height="32"/><circle class="lb" cx="81.5" cy="42" r="2"/><circle class="lb" cx="81.5" cy="52" r="2"/><circle class="lb" cx="81.5" cy="62" r="2"/>';
+    if (L === 500) s += '<path class="lc" d="M108 96l9 9 18-20"/>';
+    return s + '</svg>';
+  };
+  (document.getElementById('lodrow') || {}).innerHTML = levels.map(l => `<div class="lv">${node(+l[0])}<b>LOD ${l[0]}</b><h3>${l[1]}</h3><p>${l[2]}</p><p class="use">${l[3]}</p></div>`).join('');
+
+  const fm = document.getElementById('fm'), er = document.getElementById('er'), dn = document.getElementById('dn'), tx = document.getElementById('tx'), cp = document.getElementById('cp');
+  fm.addEventListener('submit', e => {
+    e.preventDefault();
+    const v = id => document.getElementById(id).value.trim();
+    if (!v('nm') || !v('ph') || !v('ms')) { er.textContent = 'Please add your name, a phone or email, and what you need.'; return; }
+    er.textContent = '';
+    tx.textContent = `Project enquiry: ${v('ty')}\n\nName: ${v('nm')}\nContact: ${v('ph')}\nCompany: ${v('co') || '-'}\nProject and location: ${v('st') || '-'}\n\n${v('ms')}`;
+    dn.classList.add('on');
+  });
+  cp.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(tx.textContent); cp.textContent = 'Copied'; }
+    catch (err) { cp.textContent = 'Select the text above to copy'; }
+    setTimeout(() => { cp.textContent = 'Copy enquiry'; }, 2500);
+  });
+}
+</script>
+<script>(function(){var s=document.querySelectorAll(".fm-s"),d=document.querySelectorAll(".fm-d button"),i=0,t,sl=document.querySelector(".fm-sl");if(!sl)return;
+function go(n){i=(n+s.length)%s.length;s.forEach(function(e,k){e.classList.toggle("on",k===i)});d.forEach(function(e,k){e.classList.toggle("on",k===i)})}
+function run(){clearInterval(t);t=setInterval(function(){go(i+1)},6000)}
+document.querySelector(".fm-p").onclick=function(){go(i-1);run()};document.querySelector(".fm-x").onclick=function(){go(i+1);run()};
+d.forEach(function(e,k){e.onclick=function(){go(k);run()}});
+sl.addEventListener("mouseenter",function(){clearInterval(t)});sl.addEventListener("mouseleave",run);
+var sx=0;sl.addEventListener("touchstart",function(e){sx=e.touches[0].clientX},{passive:true});sl.addEventListener("touchend",function(e){var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40){go(i+(dx<0?1:-1));run()}});
+run()})();</script><script>(function(){
+var rg=document.getElementById("rg"),sc=document.getElementById("rgs"),wd=document.getElementById("rgw"),lg=document.getElementById("rglogo"),hl=document.querySelector(".hlogo");if(hl)lg.src=hl.getAttribute("src");if(!rg||!sc)return;
+var src=[].slice.call(document.querySelectorAll("#c3t .card3"));if(!src.length)return;
+var items=src.map(function(b){var im=b.querySelector("img");return{src:im&&im.getAttribute("src"),t:(b.getAttribute("aria-label")||"").replace(/^Open project:\s*/,""),b:b}});
+var n=items.length,step=360/n,angle=0,speed=0,vel=0,R=800,drag=false,hover=false,paused=false,moved=0,front=-1,anim=null,last=0;
+var rm=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var norm=function(a){a=((a%360)+360)%360;return a>180?a-360:a};
+var cards=items.map(function(it,i){var c=document.createElement("div");c.className="rg-c";c.setAttribute("role","button");c.setAttribute("aria-label",it.t);
+var im=document.createElement("img");im.src=it.src;im.alt="";im.draggable=false;var sh=document.createElement("div");sh.className="rg-sh";c.appendChild(im);c.appendChild(sh);
+c.addEventListener("click",function(){if(moved>6)return;var f=norm(i*step+angle);if(Math.abs(f)<step/2+2){it.b.click()}else{rotateTo(i)}});
+sc.appendChild(c);return{el:c,sh:sh}});
+var st=document.getElementById("rgstars");for(var k=0;k<34;k++){var s=document.createElement("i");s.style.left=Math.random()*100+"%";s.style.top=Math.random()*100+"%";s.style.animationDelay=(Math.random()*5)+"s";s.style.opacity=.2+Math.random()*.6;st.appendChild(s)}
+function layout(){var w=rg.clientWidth,cw=Math.round(Math.min(240,Math.max(120,w*.19))),ch=Math.round(cw*.72);R=Math.round(cw/(2*Math.tan(Math.PI/n))*1.16);lg.style.width=Math.round(Math.min(330,Math.max(150,R*.62)))+"px";
+cards.forEach(function(c,i){var e=c.el.style;e.width=cw+"px";e.height=ch+"px";e.marginLeft=(-cw/2)+"px";e.marginTop=(-ch/2)+"px";e.transform="rotateY("+(i*step)+"deg) translateZ("+R+"px)"})}
+function setTitle(i){document.getElementById("rgn").textContent=("0"+(i+1)).slice(-2)+" / "+("0"+n).slice(-2);var t=document.getElementById("rgt");t.classList.remove("in");void t.offsetWidth;t.textContent=items[i].t;t.classList.add("in")}
+function render(){wd.style.transform="translateZ("+(-R)+"px) rotateX(-9deg)";sc.style.transform="rotateY("+angle+"deg)";var best=0,bd=999;

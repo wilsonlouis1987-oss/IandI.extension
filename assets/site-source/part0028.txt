@@ -1,0 +1,100 @@
+cards.forEach(function(c,i){var f=norm(i*step+angle),a=Math.abs(f),s=(1+Math.cos(f*Math.PI/180))/2;c.sh.style.opacity=(Math.pow(1-s,.75)*.8).toFixed(3);if(a<bd){bd=a;best=i}});
+if(best!==front){front=best;setTitle(best)}}
+var ease=function(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+function rotateTo(i){var target=-i*step,d=norm(target-angle);anim={from:angle,d:d,t0:performance.now(),dur:Math.min(1400,500+Math.abs(d)*5)};vel=0}
+function frame(t){if(window.__rgHold){last=t;requestAnimationFrame(frame);return}var dt=Math.min(.05,(t-(last||t))/1000);last=t;
+if(anim){var k=Math.min(1,(t-anim.t0)/anim.dur);angle=anim.from+anim.d*ease(k);if(k>=1)anim=null}
+else{var target=(hover||drag||paused||rm)?0:6;speed+=(target-speed)*Math.min(1,dt*2.5);if(!drag){angle+=(speed+vel)*dt;vel*=Math.pow(.04,dt)}}
+if(!document.hidden)render();requestAnimationFrame(frame)}
+var lx=0,lt=0;
+rg.addEventListener("pointerdown",function(e){drag=true;moved=0;lx=e.clientX;lt=performance.now();anim=null;rg.classList.add("grab")});
+window.addEventListener("pointermove",function(e){if(!drag)return;var dx=e.clientX-lx,now=performance.now(),dts=Math.max(.001,(now-lt)/1000);moved+=Math.abs(dx);angle+=dx*.28;vel=(dx*.28)/dts*.5;lx=e.clientX;lt=now});
+window.addEventListener("pointerup",function(){if(!drag)return;drag=false;rg.classList.remove("grab");vel=Math.max(-240,Math.min(240,vel));setTimeout(function(){moved=0},0)});
+rg.addEventListener("mouseenter",function(){hover=true});rg.addEventListener("mouseleave",function(){hover=false});
+rg.addEventListener("keydown",function(e){if(e.key==="ArrowRight"){rotateTo((front+1)%n)}if(e.key==="ArrowLeft"){rotateTo((front-1+n)%n)}if((e.key==="Enter"||e.key===" ")&&front>-1){e.preventDefault();items[front].b.click()}});
+document.getElementById("rgp").onclick=function(){rotateTo((front-1+n)%n)};
+document.getElementById("rgx").onclick=function(){rotateTo((front+1)%n)};
+var pp=document.getElementById("rgpp");pp.onclick=function(){paused=!paused;pp.setAttribute("aria-pressed",paused);pp.setAttribute("aria-label",paused?"Play rotation":"Pause rotation")};
+window.addEventListener("resize",layout);layout();render();requestAnimationFrame(frame);
+})();</script><script>(function(){
+var ul=document.querySelector(".why ul");if(!ul)return;
+var D=[
+{t:"15+ years of BIM experience",p:"Our Founder and BIM Manager, Wilson Louis, brings 15+ years in BIM management, architectural and structural coordination, engineering documentation and digital construction support, and leads the company's technical direction.",c:["BIM management","BEP development","CDE workflows","BIM standards","Model coordination","Shop drawings"]},
+{t:"Over two years of project delivery",p:"More than two years of company service, from our first BIM project, the Qatar Post Office, to work across Qatar, Saudi Arabia, Belgium, the US and India.",c:["Qatar","Saudi Arabia","Belgium","United States","India","11 selected projects"]},
+{t:"Civil engineering and BIM modeling",p:"Our Managing Partner, Irfana Asharaf, is a civil engineer and BIM engineer with more than five years of BIM modeling experience, and a former Assistant Professor at TKM Institute of Technology, Kollam. She turns engineering designs into coordinated, buildable BIM models.",c:["Civil engineering","BIM modeling","Technical documentation"]},
+{t:"Founder-led technical coordination",p:"The founder leads the technical direction and helps project teams coordinate disciplines and improve the quality of project information, so decisions are made early and clearly.",c:["Discipline coordination","Information quality","Technical direction"]},
+{t:"Support across every discipline",p:"One team and one standard across the disciplines a building needs, from the first model to coordinated drawings.",c:["Architectural","Structural & steel","Facade","MEP coordination","Interior design","Interior fit-out"],a:1},
+{t:"Clear, coordinated documentation",p:"Drawings are issued from the coordinated model, so installers and contractors can build from them without guessing.",c:["Plans","Elevations","Sections","Shop drawings","Schedules"]},
+{t:"Practical BIM workflows",p:"Workflows are built around real project requirements: BIM Execution Plans, CDE workflows and BIM standards, with custom Revit, Dynamo and Python tools that remove repetitive manual work.",c:["BIM Execution Plan","CDE","Revit","Dynamo","Python"]},
+{t:"Accuracy, coordination, reliable delivery",p:"From the first BIM Execution Plan to the final as-built drawing, every service is held to the same care for accuracy, coordination and delivery.",c:["LOD 100 to 500","Coordination","As-built"]}];
+var rm=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var back=document.createElement("div");back.className="wy-back";back.hidden=true;
+var card=document.createElement("div");card.className="wy-card";card.hidden=true;card.setAttribute("role","dialog");card.setAttribute("aria-modal","true");card.setAttribute("aria-labelledby","wy-t");
+card.innerHTML='<button type="button" class="wy-x" aria-label="Close">&times;</button><span class="wy-num"></span><h4 id="wy-t"></h4><p class="wy-p"></p><ul class="wy-chips"></ul><a class="wy-a" href="#services">See our services</a>';
+document.body.appendChild(back);document.body.appendChild(card);
+var cur=-1,btn=null,timer=0,token=0;
+var $=function(s){return card.querySelector(s)};
+function stopAnims(){try{card.getAnimations().forEach(function(a){a.cancel()})}catch(e){}}
+function hold(on){window.__rgHold=!!on}
+function from(b){var r=b.getBoundingClientRect(),c=card.getBoundingClientRect();return{dx:r.left+r.width/2-(c.left+c.width/2),dy:r.top+r.height/2-(c.top+c.height/2),s:Math.max(.12,r.width/c.width)}}
+function hardReset(){token++;clearTimeout(timer);stopAnims();card.hidden=true;back.hidden=true;back.classList.remove("show");card.classList.remove("show");if(btn)btn.classList.remove("on");cur=-1;hold(false)}
+function open(i,b){
+  hardReset();
+  var my=++token;cur=i;btn=b;b.classList.add("on");hold(true);var d=D[i];
+  $(".wy-num").textContent="0"+(i+1);$("#wy-t").textContent=d.t;$(".wy-p").textContent=d.p;
+  $(".wy-chips").innerHTML=d.c.map(function(x){return"<li>"+x+"</li>"}).join("");
+  $(".wy-a").style.display=d.a?"inline-block":"none";
+  card.querySelectorAll(".wy-num,h4,.wy-p,.wy-chips,.wy-a").forEach(function(e,k){e.style.animationDelay=(.16+k*.07)+"s"});
+  back.hidden=false;card.hidden=false;card.scrollTop=0;
+  requestAnimationFrame(function(){if(my!==token)return;back.classList.add("show");card.classList.add("show");
+    if(!rm){var f=from(b);card.animate([{transform:"translate("+f.dx+"px,"+f.dy+"px) scale("+f.s+")",opacity:0},{transform:"translate(0,0) scale(1.02)",opacity:1,offset:.8},{transform:"none",opacity:1}],{duration:560,easing:"cubic-bezier(.2,.85,.25,1)"})}
+    try{card.querySelector(".wy-x").focus({preventScroll:true})}catch(e){}});
+}
+function close(){
+  if(cur<0)return;var b=btn,my=++token;stopAnims();back.classList.remove("show");
+  var fin=function(){if(my!==token)return;clearTimeout(timer);stopAnims();card.hidden=true;back.hidden=true;card.classList.remove("show");b.classList.remove("on");cur=-1;hold(false);try{b.focus({preventScroll:true})}catch(e){}};
+  if(rm){fin();return}
+  var f=from(b);card.animate([{transform:"none",opacity:1},{transform:"translate("+f.dx+"px,"+f.dy+"px) scale("+f.s+")",opacity:0}],{duration:400,easing:"cubic-bezier(.6,0,.8,.4)",fill:"forwards"});
+  timer=setTimeout(fin,440);
+}
+[].slice.call(ul.children).forEach(function(li,i){var tx=li.textContent.trim();li.textContent="";
+  var b=document.createElement("button");b.type="button";b.className="wy-b";b.setAttribute("aria-haspopup","dialog");
+  b.innerHTML='<span class="wy-bn">0'+(i+1)+'</span><span class="wy-bl"></span><span class="wy-bp" aria-hidden="true"></span>';b.querySelector(".wy-bl").textContent=tx;
+  b.addEventListener("click",function(){if(cur===i&&!card.hidden){close()}else{open(i,b)}});li.appendChild(b)});
+back.addEventListener("click",close);card.querySelector(".wy-x").addEventListener("click",close);
+card.querySelector(".wy-a").addEventListener("click",function(){hardReset()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&cur>-1)close()});
+document.addEventListener("visibilitychange",function(){if(document.hidden&&cur>-1)hardReset()});
+})();</script>
+<script>(function(){
+var b=document.getElementById("whyv"),b2=document.getElementById("whyv2"),v=document.getElementById("whyvid"),o=document.getElementById("wzo"),im=document.getElementById("whyimg2");if(!b||!v||!o)return;
+if(im)im.src=v.getAttribute("poster")||"";
+document.body.appendChild(o);v.muted=true;v.defaultMuted=true;v.loop=false;
+v.addEventListener("volumechange",function(){if(!v.muted){v.muted=true}});
+var open=false;
+function openZ(){if(open)return;open=true;o.hidden=false;o.insertBefore(v,o.firstChild);v.muted=true;v.currentTime=0;
+requestAnimationFrame(function(){o.classList.add("on")});var pr=v.play();if(pr&&pr.catch)pr.catch(function(){});document.addEventListener("keydown",esc,true)}
+function closeZ(){if(!open)return;open=false;v.pause();o.classList.remove("on");document.removeEventListener("keydown",esc,true);
+setTimeout(function(){o.hidden=true;b.insertBefore(v,b.firstChild);v.currentTime=0},350)}
+function esc(e){if(e.key==="Escape"){e.stopImmediatePropagation();e.preventDefault();closeZ()}}
+b.addEventListener("click",openZ);if(b2)b2.addEventListener("click",openZ);
+v.addEventListener("click",function(e){if(open){e.stopPropagation();closeZ()}});
+o.addEventListener("click",closeZ);
+v.addEventListener("ended",closeZ);
+document.querySelectorAll("[data-stclose]").forEach(function(x){x.addEventListener("click",closeZ)});
+})();</script>
+<script>(function(){var f=document.querySelector(".fcall");if(!f||!("IntersectionObserver" in window))return;var seen=new Set();var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)seen.add(e.target);else seen.delete(e.target)});f.classList.toggle("away",seen.size>0)},{threshold:0});["contact"].forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el)});var ft=document.querySelector("footer");if(ft)io.observe(ft)})();</script>
+<script>(function(){
+var f=document.getElementById("fm"),b=document.getElementById("eqb"),bg=document.getElementById("eqbg"),x=document.getElementById("eqx"),ty=document.getElementById("ty");
+if(!f||!b)return;
+var mq=window.matchMedia("(max-width:640px)"),last=null;
+function open(){if(!mq.matches){document.getElementById("nm").focus();return}last=document.activeElement;f.classList.add("open");bg.hidden=false;document.body.classList.add("eqopen");f.scrollTop=0;setTimeout(function(){x.focus({preventScroll:true})},30)}
+function close(){f.classList.remove("open");bg.hidden=true;document.body.classList.remove("eqopen");if(last&&last.focus)last.focus({preventScroll:true})}
+window.__openEnquiry=open;f.addEventListener("submit",function(){setTimeout(function(){var d=document.getElementById("dn");if(f.classList.contains("open")&&d&&d.classList.contains("on"))d.scrollIntoView({block:"nearest",behavior:"smooth"})},60)});
+b.addEventListener("click",open);x.addEventListener("click",close);bg.addEventListener("click",close);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&f.classList.contains("open"))close()});
+mq.addEventListener&&mq.addEventListener("change",function(){if(!mq.matches)close()});
+function pick(t){t=t.toLowerCase();var best=null;[].forEach.call(ty.options,function(o){var v=o.text.toLowerCase();if(!best&&(t.indexOf(v)>-1||v.indexOf(t)>-1))best=o});
+ if(!best&&t.indexOf("steel")>-1)best=[].filter.call(ty.options,function(o){return/steel/i.test(o.text)})[0];
+ if(!best&&t.indexOf("interior")>-1)best=ty.options[0];if(best)ty.value=best.value}
+document.querySelectorAll('a[href="#contact"]').forEach(function(a){var t=a.textContent.trim();
