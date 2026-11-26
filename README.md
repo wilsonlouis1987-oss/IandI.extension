@@ -17,4 +17,4 @@ The integrated source package has online guards in the main Python node of all 5
 
 **Release is not production-ready yet:** the live HTTPS API has not been deployed because the configured persistent database service requires Render billing setup; Revit/Dynamo runtime QA and a refreshed installer are pending; no official checkout or automated key delivery is connected. Please do not purchase Pro until the website announces a tested release.
 
-The updated integrated source package is available in the current ChatGPT conversation as `IandI_BIM_Tools_ProGate_Integrated_Source_v4.zip`.
+An updated integrated source ZIP has been prepared for the owner, but it has not yet been attached as a public GitHub release asset.
