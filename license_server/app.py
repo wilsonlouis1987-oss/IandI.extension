@@ -16,7 +16,8 @@ def db():
     c.execute('CREATE TABLE IF NOT EXISTS licenses(key_hash TEXT PRIMARY KEY,plan TEXT NOT NULL,expires_at TEXT,max_devices INTEGER NOT NULL DEFAULT 1,revoked INTEGER NOT NULL DEFAULT 0,created_at TEXT NOT NULL)')
     # Migrate the original prototype schema, which did not include created_at.
     cols=[row[1] for row in c.execute('PRAGMA table_info(licenses)').fetchall()]
-    if 'created_at' not in cols: c.execute('ALTER TABLE licenses ADD COLUMN created_at TEXT')\n    c.execute('CREATE TABLE IF NOT EXISTS activations(key_hash TEXT NOT NULL,device_id TEXT NOT NULL,activated_at TEXT NOT NULL,PRIMARY KEY(key_hash,device_id))')
+    if 'created_at' not in cols: c.execute('ALTER TABLE licenses ADD COLUMN created_at TEXT')
+    c.execute('CREATE TABLE IF NOT EXISTS activations(key_hash TEXT NOT NULL,device_id TEXT NOT NULL,activated_at TEXT NOT NULL,PRIMARY KEY(key_hash,device_id))')
     return c
 
 def digest(k): return hashlib.sha256(k.strip().encode('utf-8')).hexdigest()
