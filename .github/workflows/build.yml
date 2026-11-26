@@ -1,34 +1,31 @@
-name: Build Installer
+name: Publish Installer
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - I_and_I_BIM_Tools_Installer.exe
+      - .github/workflows/build.yml
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  publish:
     runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Inno Setup
-        run: choco install innosetup -y
+      - name: Prepare installer
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path Output | Out-Null
+          Copy-Item I_and_I_BIM_Tools_Installer.exe Output/I_and_I_BIM_Tools_Installer.exe
 
-      - name: Compile Installer
-        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss'
-
-      - name: Upload Installer
-        uses: actions/upload-artifact@v4
-        with:
-          name: installer
-          path: Output/*.exe
-
-      - name: Attach to Release v1.0.0
+      - name: Attach installer to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.0
-          files: Output/*.exe
+          files: Output/I_and_I_BIM_Tools_Installer.exe
