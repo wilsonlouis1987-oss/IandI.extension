@@ -77,7 +77,7 @@
   const stg = document.getElementById('stg');
   const cardH = x => `<article class="sc" data-g="${x.g.id}" data-q="${esc((x.c+' '+x.t+' '+x.d+' '+x.tg.join(' ')).toLowerCase())}"><div class="scb"><div class="sct"><span class="scc">${x.c}</span><h3>${esc(x.t)}</h3></div><p>${esc(x.d)}</p><code class="scf">${esc(x.f)}</code><div class="scr"><span class="sctg">Dynamo${x.tg.map(t => ' · ' + esc(t)).join('')}</span><button type="button" data-buy="${x.c}"><svg aria-hidden="true"><use href="#ic-bag"/></svg>Buy</button></div></div></article>`;
   stg.innerHTML = SG.map(g => `<section class="sgp" data-g="${g.id}"><div class="sgh"><div><span class="sgk">${g.k}</span><h3>${esc(g.t)}</h3><small>${g.n.length} scripts · Price on request</small></div><button type="button" class="sgb" data-pack="${g.id}"><svg aria-hidden="true"><use href="#ic-bag"/></svg>Buy the ${g.k} pack</button></div><div class="sgl">${g.n.map(x => cardH(ALL.find(y => y.c === x[0]))).join('')}</div></section>`).join('') + '<p class="sempty" id="sempty" hidden>No scripts match your search.</p>';
-  document.getElementById('stcount').textContent = ALL.length;
+  (document.getElementById('stcount') || {}).textContent = ALL.length;
   const store = document.getElementById('store');
   let stFocus = null;
   const openStore = e => { stFocus = e?.currentTarget || null; store.hidden = false; document.body.classList.add('stopen'); store.querySelector('.pmx').focus({ preventScroll: true }); };
